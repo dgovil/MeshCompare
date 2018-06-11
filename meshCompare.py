@@ -38,6 +38,9 @@ def static_compare(mesh, target, clamp=10, world=True, saturation=0.8):
     space = om.MSpace.kWorld if world else om.MSpace.kObject
     mesh_points = mesh_mesh.getPoints(space)
     target_points = target_mesh.getPoints(space)
+    
+    if len(mesh_points) != len(target_points):
+        raise RuntimeError("Meshes do not have the same vertex count")
 
     colors = om.MColorArray()
     ids = []
