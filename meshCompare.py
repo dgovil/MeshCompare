@@ -9,15 +9,18 @@ logger = logging.getLogger('MeshCompare')
 logger.setLevel(logging.DEBUG)
 
 
-def static_compare(mesh, target, clamp=10, world=True):
+def static_compare(mesh, target, clamp=10, world=True, saturation=0.8):
     """
     Compares two meshes on a given static frame.
     Sets a vertex color value to show the distance values.
+    Colors will go from green at the least to red at the point of clamping.
     
     :param mesh: The name or path to the mesh to visualize on.
     :param target: The name or path of the mesh we are comparing against.
     :param clamp: The value to clamp against. All values be scaled accordingly.
+                  i.e if you clamp at 10, absolute red will be 10 units
     :param world: Whether to compare in world space or object space.
+    :param saturation: The maximum saturation value to use
     """
     # Get the Dag Paths to the mesh shapes
     mesh = get_shape(mesh)
@@ -50,20 +53,23 @@ def static_compare(mesh, target, clamp=10, world=True):
             ((mpoint.z - tpoint.z) ** 2)
         )
 
+        hue = 0
+        sat = 0
+        val = 0.5
         # If our distance is not zero, then process it
         if distance:
+            sat = saturation
+            val = 1
             # First scale according to the clamp value
             scaled = distance / clamp
             # Then clamp it off at 1
             clamped = min(scaled, 1)
-            # Finally we only want half its value since our base color is 50% grey
-            distance = clamped / 2.0
+            hue = 180 - ((360*clamped)/2)
+        
 
         # Start from 50% grey and bias to the red channel as distance grows
         color = om.MColor((
-            0.5 + distance,
-            0.5 - distance,
-            0.5 - distance))
+            hue, sat, val), om.MColor.kHSV)
 
         colors.append(color)
         ids.append(i)
@@ -110,4 +116,4 @@ def get_shape(path):
 
 if __name__ == '__main__':
     logger.warning('Running main namespace tests')
-    static_compare('pCube2', 'pCube1', clamp=100)
+    static_compare('pCube2', 'pCube1', clamp=10)
