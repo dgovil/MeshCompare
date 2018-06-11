@@ -6,6 +6,10 @@ These are visualized as vertex colors.
 Currently there is only a python script that does a comparison on a single frame, but I will eventually add a deformer
 node that will do the same dynamically.
 
+This is still very rough, and performance is not my current goal but I'd like to get there.
+So if you have any suggestions, please file an issue or, better yet, a pull request.
+
+Specifically if someone has any ideas for better color schemes I'm all ears.
 
 # Usage
 
