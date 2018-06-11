@@ -22,3 +22,6 @@ Specifically if someone has any ideas for better color schemes I'm all ears.
     from meshCompare import static_compare
     static_compare('pCube2', 'pCube1')
     ```
+    
+3. Adjust the `clamp` parameter to affect how strong the coloring is. 
+   You can also adjust the `world` parameter to control whether comparisons happen in world space or object space.
