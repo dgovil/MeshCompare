@@ -48,6 +48,6 @@ Once compiled, pleace the plugin in your Maya plugin path and you can run a simi
 
 
     ```python
-    from meshCompare import static_compare
+    from meshCompare import dynamic_compare
     dynamic_compare('pCube2', 'pCube1')
     ```
