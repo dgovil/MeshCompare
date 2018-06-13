@@ -140,7 +140,6 @@ MStatus meshCompare::deform(MDataBlock &block,
 
         colors.append(color);
         indexes.append(idx);
-        inputMesh.setVertexColor(color, idx);
 
     }
 
@@ -153,7 +152,7 @@ MStatus meshCompare::deform(MDataBlock &block,
     }
 
 
-//    inputMesh.setVertexColors(colors, indexes);
+    inputMesh.setVertexColors(colors, indexes);
     return MS::kSuccess;
 }
 
