@@ -24,6 +24,8 @@ public:
     static MObject target;
     static MObject clamp;
     static MObject saturation;
+
+    void postConstructor() override;
 };
 
 #endif //PROJECT_MESHCOMPARE_H

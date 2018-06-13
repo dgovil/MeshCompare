@@ -45,7 +45,7 @@ MStatus meshCompare::initialize() {
     status = attributeAffects(target, meshCompare::outputGeom);
     CHECK_MSTATUS_AND_RETURN_IT(status);
 
-    clamp = nAttr.create("clamp", "clamp", MFnNumericData::kFloat, 1, &status);
+    clamp = nAttr.create("clamp", "clamp", MFnNumericData::kFloat, 1.0f, &status);
     CHECK_MSTATUS_AND_RETURN_IT(status);
     nAttr.setMin(0.01f);
     nAttr.setKeyable(true);
@@ -54,7 +54,7 @@ MStatus meshCompare::initialize() {
     status = attributeAffects(clamp, meshCompare::outputGeom);
     CHECK_MSTATUS_AND_RETURN_IT(status);
 
-    saturation = nAttr.create("saturation", "saturation", MFnNumericData::kFloat, 0.8, &status);
+    saturation = nAttr.create("saturation", "saturation", MFnNumericData::kFloat, 1.0f, &status);
     CHECK_MSTATUS_AND_RETURN_IT(status);
     nAttr.setMin(0.0f);
     nAttr.setMax(1.0f);
@@ -99,8 +99,6 @@ MStatus meshCompare::deform(MDataBlock &block,
     float saturationValue = saturationHandle.asFloat();
 
 
-    MColorArray colors;
-    MIntArray indexes;
     MPointArray targetPoints;
     targetMesh.getPoints(targetPoints, MSpace::kObject);
 
@@ -124,35 +122,27 @@ MStatus meshCompare::deform(MDataBlock &block,
         float sat = 0.2;
         float val = 0.5;
 
+        MColor color(0.5f, 0.5f, 0.5f);
         if (distance > 0.0f) {
             sat = saturationValue;
             val = 1;
             distance = (distance / clampValue);
+
             if (distance > 1.0) {
                 distance = 1.0;
             }
 
             hue = 180.0f - ((360.0f * distance) / 2);
+            color = MColor(MColor::kHSV, hue, sat, val);
 
         }
 
-        MColor color(MColor::MColorType::kHSV,hue, sat, val);
-
-        colors.append(color);
-        indexes.append(idx);
+        inputMesh.setVertexColor(color, idx);
 
     }
 
-    for (int x=0; x < colors.length(); x++) {
-        auto color = colors[x];
-        int idx = indexes[x];
-        std::string msg = "Color is: " + std::to_string(color.r) + " " +  std::to_string(color.g) + " " + std::to_string(color.b);
-        msg += "   for idx" + std::to_string(idx);
-        MGlobal::displayInfo(msg.c_str());
-    }
 
 
-    inputMesh.setVertexColors(colors, indexes);
     return MS::kSuccess;
 }
 
@@ -184,4 +174,9 @@ MStatus uninitializePlugin(MObject obj) {
     CHECK_MSTATUS_AND_RETURN_IT(status);
 
     return MS::kSuccess;
+}
+
+void meshCompare::postConstructor()
+{
+    MPxDeformerNode::setDeformationDetails(MPxDeformerNode::kDeformsColors);
 }

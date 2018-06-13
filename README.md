@@ -55,5 +55,3 @@ mc.select(clear=True)
 
 mc.viewFit()
 ```
-
-There's currently an issue I am trying to debug where it doesn't set colors yet.
