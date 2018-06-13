@@ -46,8 +46,13 @@ It defaults to Maya 2018 but you can specify a Maya Version by passing the `MAYA
 
 Once compiled, pleace the plugin in your Maya plugin path and you can run a similar command
 
+```python
+from meshCompare import dynamic_compare
+dynamic_compare('pCube2', 'pCube1')
+```
 
-    ```python
-    from meshCompare import dynamic_compare
-    dynamic_compare('pCube2', 'pCube1')
-    ```
+# License and Others
+
+The code is available under an MIT license. 
+
+If you have requests or ideas, please put in a pull request or file an issue.
