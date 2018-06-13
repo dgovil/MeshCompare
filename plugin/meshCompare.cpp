@@ -104,6 +104,9 @@ MStatus meshCompare::deform(MDataBlock &block,
 
     int numTargetPoints = targetPoints.length();
 
+    MIntArray indexes;
+    MColorArray colors;
+
     for (; !iter.isDone(); iter.next()) {
         MPoint mpoint = iter.position();
         int idx = iter.index();
@@ -112,14 +115,14 @@ MStatus meshCompare::deform(MDataBlock &block,
         }
         MPoint tpoint = targetPoints[idx];
 
-        float dx = (mpoint.x - tpoint.x);
-        float dy = (mpoint.y - tpoint.y);
-        float dz = (mpoint.z - tpoint.z);
+        double dx = (mpoint.x - tpoint.x);
+        double dy = (mpoint.y - tpoint.y);
+        double dz = (mpoint.z - tpoint.z);
 
-        float distance = sqrt((dx * dx) + (dy * dy) + (dz * dz));
+        float distance = (float)sqrt((dx * dx) + (dy * dy) + (dz * dz));
 
         float hue = 180;
-        float sat = 0.2;
+        float sat = 0.0;
         float val = 0.5;
 
         MColor color(0.5f, 0.5f, 0.5f);
@@ -130,17 +133,22 @@ MStatus meshCompare::deform(MDataBlock &block,
 
             if (distance > 1.0) {
                 distance = 1.0;
+            } else if (distance < 0.3) {
+                sat = sat * distance;
+                val = (distance*0.5)+0.5;
             }
 
             hue = 180.0f - ((360.0f * distance) / 2);
-            color = MColor(MColor::kHSV, hue, sat, val);
+            color = MColor(MColor::MColorType::kHSV, hue, sat, val);
 
         }
 
-        inputMesh.setVertexColor(color, idx);
+        indexes.append(idx);
+        colors.append(color);
 
     }
 
+    inputMesh.setVertexColors(colors, indexes);
 
 
     return MS::kSuccess;
