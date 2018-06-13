@@ -9,7 +9,44 @@ logger = logging.getLogger('MeshCompare')
 logger.setLevel(logging.DEBUG)
 
 
-def static_compare(mesh, target, clamp=10, world=True, saturation=0.8):
+def dynamic_compare(mesh, target, clamp=1, saturation=1):
+    """
+    Compares two meshes dynamically.
+    This requires that the meshCompare plugin be compiled and available in the plugin path.
+
+    :param mesh: The mesh you want to view the changes on.
+    :param target: The mesh you are comparing against
+    :param clamp: The value to clamp against. All values be scaled accordingly.
+                  i.e if you clamp at 10, absolute red will be 10 units
+    :param saturation: The maximum saturation value to use
+    """
+
+    loaded = mc.pluginInfo('meshCompare', query=True, loaded=True)
+    if not loaded:
+        try:
+            mc.loadPlugin('meshCompare')
+        except:
+            mc.error("Could not load meshCompare plugin."
+                     "Please make sure it is compiled and in your plugin path")
+    
+    mesh = get_shape(mesh)
+    target = get_shape(target)
+    
+    mesh_path = mesh.fullPathName()
+    target_path = target.fullPathName()
+    
+    mc.polyOptions(mesh_path, colorShadedDisplay=True)
+    deformer = mc.deformer(mesh_path, type='meshCompare')[0]
+    mc.polyOptions(mesh_path, colorShadedDisplay=True)
+    
+    mc.connectAttr('%s.outMesh' % target_path, '%s.target' % deformer)
+
+    mc.setAttr('%s.saturation' % deformer, saturation)
+    mc.setAttr('%s.clamp' % deformer, clamp)
+
+    
+
+def static_compare(mesh, target, clamp=1, world=False, saturation=0.8):
     """
     Compares two meshes on a given static frame.
     Sets a vertex color value to show the distance values.
@@ -115,8 +152,26 @@ def get_shape(path):
     dag = sel.getDagPath(0)
 
     return dag
+    
+def __test(static=False):
+    """Simple test function"""
+    logger.warning('Running main namespace tests')
+    mc.file(new=True, force=True)
+    mc.polyCube()
+    mc.polyCube()
+    mc.select('pCube2.vtx[4]')
+    mc.move(0, 1, 0, r=True)
+
+    mc.select('pCube2.vtx[3]')
+    mc.move(0, 0.4, 0, r=True)
+    mc.select(clear=True)
+    mc.setAttr('pCube1.visibility', 0)
+    if static:
+        dynamic_compare('pCube2', 'pCube1')
+    else:
+        static_compare('pCube2', 'pCube1')
+    mc.viewFit()
 
 
 if __name__ == '__main__':
-    logger.warning('Running main namespace tests')
-    static_compare('pCube2', 'pCube1', clamp=10)
+    __test()
