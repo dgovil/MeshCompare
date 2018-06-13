@@ -1,0 +1,31 @@
+cmake_minimum_required(VERSION 3.4)
+project(meshCompare)
+
+set(CMAKE_CXX_STANDARD 11)
+
+set(OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build)
+if(NOT EXISTS ${OUTPUT_DIRECTORY})
+    file(MAKE_DIRECTORY ${OUTPUT_DIRECTORY})
+endif()
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${OUTPUT_DIRECTORY})
+
+
+if (NOT DEFINED MAYA_VERSION)
+    set(MAYA_VERSION 2018 CACHE STRING "Maya Version")
+endif()
+
+# Set Project source directory
+set(PROJECT_SOURCE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/plugin)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIRECTORY})
+
+set(
+        SOURCE_FILES
+        ${PROJECT_SOURCE_DIRECTORY}/meshCompare.h
+        ${PROJECT_SOURCE_DIRECTORY}/meshCompare.cpp
+)
+
+find_package(Maya REQUIRED)
+add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
+target_include_directories(${PROJECT_NAME} PRIVATE Maya::Maya)
+target_link_libraries(${PROJECT_NAME} PRIVATE Maya::Maya)
+MAYA_PLUGIN(${PROJECT_NAME})

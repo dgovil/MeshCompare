@@ -25,3 +25,35 @@ Specifically if someone has any ideas for better color schemes I'm all ears.
     
 3. Adjust the `clamp` parameter to affect how strong the coloring is. 
    You can also adjust the `world` parameter to control whether comparisons happen in world space or object space.
+
+## Deformer
+
+The deformer will require to be compiled.
+It defaults to Maya 2018 but you can specify a Maya Version by passing the `MAYA_VERSION` parameter to CMake.
+
+
+To run it
+
+```python
+import maya.cmds as mc
+mc.file(new=True, force=True)
+try:
+    mc.unloadPlugin('meshCompare', force=True)
+finally:
+    mc.loadPlugin("/Users/dhruv/Projects/meshCompare/build/meshCompare.bundle")
+target = mc.polyCube()[0]
+mesh = mc.polyCube()[0]
+
+mc.polyOptions('pCubeShape2', colorShadedDisplay=True)
+mc.setAttr('pCube1.visibility', 0)
+deformer = mc.deformer('pCube2', type='meshCompare')[0]
+
+mc.connectAttr('pCubeShape1.outMesh', '%s.target' % deformer)
+mc.select('pCube2.vtx[4]')
+mc.move(0, 10, 0.5, r=True)
+mc.select(clear=True)
+
+mc.viewFit()
+```
+
+There's currently an issue I am trying to debug where it doesn't set colors yet.
